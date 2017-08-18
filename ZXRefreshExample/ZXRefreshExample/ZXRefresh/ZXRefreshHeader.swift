@@ -9,17 +9,25 @@
 import UIKit
 
 public protocol ZXRefreshHeaderDelegate {
-    func headerToNormalState()
-    func headerToRefreshingState()
-    func headerToPullingState()
-    func headerSet(pullingPercent: CGFloat)
-    func headerToWillRefreshState()
+    
+    func toNormalState()
+    func toRefreshingState()
+    func toPullingState()
+    func toWillRefreshState()
+    func changePullingPercent(percent: CGFloat)
+    func willBeginEndRefershing(isSuccess: Bool)
+    /// 控件的高度
+    func contentHeight() -> CGFloat
 }
 
 public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
     
     /// reload data block
-    var refreshBlock: () -> Void = { print("refreshBlock") }
+    var refreshBlock: () -> Void = { }
+    
+    public var delegate: ZXRefreshHeaderDelegate? {
+        get { return self as? ZXRefreshHeaderDelegate }
+    }
     
     var contentView: UIView = {
         let view = UIView()
@@ -31,37 +39,35 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
     
     var pullingPercent: CGFloat = 0 {
         didSet {
-            let delegate: ZXRefreshHeaderDelegate? = self as? ZXRefreshHeaderDelegate
-            delegate?.headerSet(pullingPercent: pullingPercent)
+            delegate?.changePullingPercent(percent: pullingPercent)
         }
     }
     
-    
     override var state: ZXRefreshState {
-        // FIXME: get方法可能死循环，需要测试
         didSet {
             guard oldValue != state else {
                 return
             }
             
-            let sub: ZXRefreshHeaderDelegate? = self as? ZXRefreshHeaderDelegate
             switch state {
             case .idle:
                 guard oldValue == ZXRefreshState.isRefreshing else {
                     return
                 }
-                // 恢复Inset
+                
                 UIView.animate(withDuration: ZXRefreshConstant.animationDuration, animations: {
                     self.scrollView?.contentInset.top += self.insetTDelta
-                    sub?.headerToNormalState()
+                }, completion: { (finished) in
+                    // reload
+                    self.delegate?.toNormalState()
                 })
             case .pulling:
                 DispatchQueue.main.async {
-                    sub?.headerToPullingState()
+                    self.delegate?.toPullingState()
                 }
             case .willRefresh:
                 DispatchQueue.main.async {
-                    sub?.headerToWillRefreshState()
+                    self.delegate?.toWillRefreshState()
                 }
             case .isRefreshing:
                 DispatchQueue.main.async {
@@ -75,7 +81,7 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
                         // 设置滚动位置
                         self.scrollView?.contentOffset = CGPoint(x: 0, y: -top)
                     }, completion: { (isFinish) in
-                        sub?.headerToRefreshingState()
+                        self.delegate?.toRefreshingState()
                         // 执行刷新操作
                         self.refreshBlock()
                     })
@@ -98,33 +104,53 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: Layout
+    
+    public override func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        
+        guard newSuperview != nil else {
+            // newSuperview == nil 被移除的时候
+            return
+        }
+        
+        // newSuperview != nil 被添加到新的View上
+        self.mj_y = -self.mj_h
+    }
     
     override public func layoutSubviews() {
         super.layoutSubviews()
         
-        // change frame
-        var f = frame
-        f.origin.y = -frame.size.height
-        self.frame = f
-        print("f.origin.y = \(f.origin.y) frame.size.height = \(frame.size.height)")
-
         self.contentView.frame = self.bounds
     }
     
-    // MARK: - ZXRefreshComponentDelegate
+    /// 控件拖动到该高度处松开就刷新(特殊的控件需要重写该方法，返回不同的数值)
+    ///
+    /// - Returns: 触发刷新的高度
+    func triggerRefreshHeith() -> CGFloat {
+        return self.mj_h
+    }
     
-    open func scollViewContentOffsetDidChange(_ change: [NSKeyValueChangeKey : Any]?) {
+    /// Loadding动画显示区域的高度(特殊的控件需要重写该方法，返回不同的数值)
+    ///
+    /// - Returns: Loadding动画显示区域的高度
+    func refreshingHoldHeith() -> CGFloat {
+        return self.mj_h
+    }
+    
+    
+    // MARK: - ZXRefreshComponentDelegate
+    open func scollViewContentOffsetDidChange(change: [NSKeyValueChangeKey : Any]?) {
         
-        guard let scrollV = self.scrollView
-            else {
+        guard let scrollV = self.scrollView else {
                 return
         }
         
         let originalInset = self.scrollViewOriginalInset!
         
         if state == .isRefreshing {
-            
+            guard let _ = self.window else {
+                return
+            }
             var insetT: CGFloat = -scrollV.contentOffset.y > originalInset.top ? -scrollV.contentOffset.y : originalInset.top
             insetT = insetT > self.frame.height + originalInset.top ? self.frame.height + originalInset.top : insetT
             
@@ -137,9 +163,9 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
         self.scrollViewOriginalInset = scrollV.contentInset
         
         // 当前的contentOffset
-        let offsetY: CGFloat = scrollV.contentOffset.y;
+        let offsetY: CGFloat = scrollV.mj_offsetY
         // 头部控件刚好出现的offsetY
-        let headerInOffsetY: CGFloat = -originalInset.top;
+        let headerInOffsetY: CGFloat = -originalInset.top
         
         // 如果是向上滚动头部控件还没出现，直接返回
         guard offsetY <= headerInOffsetY else {
@@ -189,17 +215,17 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
         }
     }
     
-    open func scollViewContentSizeDidChange(_ change: [NSKeyValueChangeKey : Any]?) {
+    open func scollViewContentSizeDidChange(change: [NSKeyValueChangeKey : Any]?) {
         
     }
     
-    open func scollViewPanStateDidChange(_ change: [NSKeyValueChangeKey : Any]?) {
-        
-    }
     
-    final public func endRefresing() {
-        DispatchQueue.main.async {
-            print("header.endRefresing()")
+    final public func endRefresing(isSuccess: Bool) {
+        
+        let delegate: ZXRefreshHeaderDelegate? = self as? ZXRefreshHeaderDelegate
+        delegate?.willBeginEndRefershing(isSuccess: isSuccess)
+        let deadLineTime = DispatchTime.now() + .seconds(1)
+        DispatchQueue.main.asyncAfter(deadline: deadLineTime) {
             self.state = .idle
         }
     }
@@ -209,10 +235,10 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
 class DefaultZXRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
     
     lazy var pullingIndicator: UIImageView = {
-        let pindicator = UIImageView()
-        pindicator.image = UIImage(named: "tableview_pull_refresh", in: Bundle(for: DefaultZXRefreshHeader.self), compatibleWith: nil)
+        let indicator = UIImageView()
+        indicator.image = UIImage(named: "tableview_pull_refresh", in: Bundle(for: DefaultZXRefreshHeader.self), compatibleWith: nil)
         
-        return pindicator
+        return indicator
     }()
     
     lazy var loaddingIndicator: UIActivityIndicatorView = {
@@ -232,7 +258,6 @@ class DefaultZXRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
         return label
     }()
     
-    // MARK: Life Cycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -246,7 +271,7 @@ class DefaultZXRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: Layout
+    
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -261,20 +286,26 @@ class DefaultZXRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
     }
     
     
+    /// 设置控件的高度
+    ///
+    /// - Returns: 控件的高度
+    func contentHeight() -> CGFloat {
+        return 60
+    }
     
-    func headerToNormalState() {
-        print("-------> headerToNormalState() ")
+    
+    func toNormalState() {
         self.loaddingIndicator.isHidden = true
         self.loaddingIndicator.stopAnimating()
     }
-    func headerToRefreshingState() {
-        print("-------> headerToRefreshingState() ")
+    
+    func toRefreshingState() {
         self.loaddingIndicator.isHidden = false
         self.loaddingIndicator.startAnimating()
         messageLabel.text = ZXHeaderString.refreshing
     }
-    func headerToPullingState() {
-        print("-------> headerToPullingState() ")
+    
+    func toPullingState() {
         self.loaddingIndicator.isHidden = true
         messageLabel.text = ZXHeaderString.pullDownToRefresh
         
@@ -285,8 +316,8 @@ class DefaultZXRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
             self.pullingIndicator.transform = CGAffineTransform.identity
         })
     }
-    func headerToWillRefreshState() {
-        print("-------> headerToWillRefreshState() ")
+    
+    func toWillRefreshState() {
         messageLabel.text = ZXHeaderString.releaseToRefresh
         self.loaddingIndicator.isHidden = true
         
@@ -297,27 +328,22 @@ class DefaultZXRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
             self.pullingIndicator.transform = CGAffineTransform(rotationAngle: CGFloat(-Double.pi+0.000001))
         })
     }
-    func headerSet(pullingPercent: CGFloat) {
+    
+    func changePullingPercent(percent: CGFloat) {
+        // here do nothing
+    }
+    
+    func willBeginEndRefershing(isSuccess: Bool) {
+        self.pullingIndicator.transform = CGAffineTransform.identity
+        self.loaddingIndicator.isHidden = true
         
-    }
-}
-
-/// 指示器进度
-class WaterIndicator: UIView {
-    
-    let maxRadius: CGFloat = 15.0
-    
-    var progress: CGFloat {
-        get { return self.progress }
-        set {
-            if progress != newValue {
-                self.setNeedsDisplay()
-            }
+        if isSuccess {
+            messageLabel.text =  ZXHeaderString.refreshSuccess
+            pullingIndicator.image = UIImage(named: "success", in: Bundle(for: DefaultZXRefreshHeader.self), compatibleWith: nil)
+        } else {
+            messageLabel.text =  ZXHeaderString.refreshFailure
+            pullingIndicator.image = UIImage(named: "failure", in: Bundle(for: DefaultZXRefreshHeader.self), compatibleWith: nil)
         }
-    }
-    
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
         
     }
 }

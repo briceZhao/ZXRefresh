@@ -24,14 +24,15 @@ public enum ZXRefreshState {
 }
 
 public protocol ZXRefreshComponentDelegate {
-    func scollViewContentOffsetDidChange(_ change: [NSKeyValueChangeKey : Any]?)
-    func scollViewContentSizeDidChange(_ change: [NSKeyValueChangeKey : Any]?)
-    func scollViewPanStateDidChange(_ change: [NSKeyValueChangeKey : Any]?)
+    
+    func scollViewContentOffsetDidChange(change: [NSKeyValueChangeKey : Any]?)
+    func scollViewContentSizeDidChange(change: [NSKeyValueChangeKey : Any]?)
+    
 }
 
 public class ZXRefreshComponent: UIView {
     
-    public weak var scrollView: UIScrollView?
+    public var scrollView: UIScrollView?
     
     public var scrollViewOriginalInset: UIEdgeInsets?
     
@@ -63,6 +64,7 @@ public class ZXRefreshComponent: UIView {
         super.willMove(toSuperview: newSuperview)
         
         guard (newSuperview?.isKind(of: UIScrollView.self))! else {
+
             return
         }
         
@@ -88,13 +90,13 @@ public class ZXRefreshComponent: UIView {
     private func addObservers() {
         scrollView?.addObserver(self, forKeyPath: ZXRefreshConstant.keyPathContentOffset, options: .new, context: nil)
         scrollView?.addObserver(self, forKeyPath: ZXRefreshConstant.keyPathContentSize, options: .new, context: nil)
-        scrollView?.panGestureRecognizer.addObserver(self, forKeyPath: ZXRefreshConstant.keyPathPanState, options: .new, context: nil)
+        
     }
     
     private func removeObservers() {
         scrollView?.removeObserver(self, forKeyPath: ZXRefreshConstant.keyPathContentOffset)
         scrollView?.removeObserver(self, forKeyPath: ZXRefreshConstant.keyPathContentSize)
-        scrollView?.panGestureRecognizer.removeObserver(self, forKeyPath: ZXRefreshConstant.keyPathPanState)
+        
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -105,7 +107,7 @@ public class ZXRefreshComponent: UIView {
         if let delegate:ZXRefreshComponentDelegate = self as? ZXRefreshComponentDelegate {
             
             if keyPath == ZXRefreshConstant.keyPathContentSize {
-                delegate.scollViewContentSizeDidChange(change)
+                delegate.scollViewContentSizeDidChange(change: change)
             }
             
             guard !self.isHidden else {
@@ -113,9 +115,7 @@ public class ZXRefreshComponent: UIView {
             }
             
             if keyPath == ZXRefreshConstant.keyPathContentOffset {
-                delegate.scollViewContentOffsetDidChange(change)
-            } else if keyPath == ZXRefreshConstant.keyPathPanState {
-                delegate.scollViewPanStateDidChange(change)
+                delegate.scollViewContentOffsetDidChange(change: change)
             }
         }
     }

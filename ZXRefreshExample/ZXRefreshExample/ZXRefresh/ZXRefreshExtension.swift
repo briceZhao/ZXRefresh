@@ -32,11 +32,13 @@ extension UIScrollView {
     /// 添加下拉刷新
     
     public func addRefreshHeaderView(_ refreshHeader: ZXRefreshHeader? = DefaultZXRefreshHeader(), refreshBlock:@escaping () -> Void) {
-        if let _: ZXRefreshHeaderDelegate = self as? ZXRefreshHeaderDelegate {
+        
+        guard refreshHeader is ZXRefreshHeaderDelegate  else {
             fatalError("refreshHeader must implement ZXRefreshHeaderDelegate")
         }
-        if let header: DefaultZXRefreshHeader = refreshHeader as? DefaultZXRefreshHeader {
-            header.frame = CGRect(x: 0, y: 0, width: self.mj_w, height: 60.0)
+        
+        if let header: ZXRefreshHeader = refreshHeader, let delegate = header.delegate {
+            header.frame = CGRect(x: 0, y: 0, width: self.mj_w, height: delegate.contentHeight())
         }
         if zx_header != refreshHeader {
             zx_header?.removeFromSuperview()
@@ -67,8 +69,8 @@ extension UIScrollView {
         }
     }
     
-    public func endRefreshing() {
-        self.zx_header?.endRefresing()
+    public func endRefreshing(isSuccess: Bool) {
+        self.zx_header?.endRefresing(isSuccess: isSuccess)
     }
 }
 

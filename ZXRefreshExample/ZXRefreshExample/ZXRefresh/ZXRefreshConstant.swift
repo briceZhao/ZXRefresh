@@ -15,14 +15,12 @@ class ZXRefreshConstant {
     static let keyPathContentOffset: String = "contentOffset"
     static let keyPathContentInset: String = "contentInset"
     static let keyPathContentSize: String = "contentSize"
-    static let keyPathPanState: String = "state"
+    
     
     static var associatedObjectRefreshHeader = 0
     static var associatedObjectRefreshFooter = 1
     
 }
-
-
 
 struct ZXHeaderString{
     static let pullDownToRefresh = "pullDownToRefresh"
@@ -34,8 +32,8 @@ struct ZXHeaderString{
 
 struct ZXFooterString{
     static let pullUpToRefresh = "pullUpToRefresh"
-    static let refreshing = "refreshing"
+    static public let loadding = "loadMore"
     static let noMoreData = "noMoreData"
-    static let tapToRefresh = "tapToRefresh"
+    static public let releaseLoadMore = "releaseLoadMore"
     static let scrollAndTapToRefresh = "scrollAndTapToRefresh"
 }
