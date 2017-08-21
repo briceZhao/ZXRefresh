@@ -297,6 +297,8 @@ class DefaultZXRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
     func toNormalState() {
         self.loaddingIndicator.isHidden = true
         self.loaddingIndicator.stopAnimating()
+        messageLabel.text =  ZXHeaderString.pullDownToRefresh
+        pullingIndicator.image = UIImage(named: "tableview_pull_refresh", in: Bundle(for: DefaultZXRefreshHeader.self), compatibleWith: nil)
     }
     
     func toRefreshingState() {
