@@ -55,9 +55,14 @@ extension UIScrollView {
     
     public func addLoadMoreFooterView(_ loadMoreFooter: ZXLoadMoreFooter? = DefaultZXLoadMoreFooter(), loadMoreBlock:@escaping () -> Void) {
         
-        if let _: ZXLoadMoreFooterDelegate = self as? ZXLoadMoreFooterDelegate {
+        guard loadMoreFooter is ZXLoadMoreFooterDelegate else {
             fatalError("loadMoreFooter must implement ZXLoadMoreFooterDelegate")
         }
+        
+        if let footer: ZXLoadMoreFooter = loadMoreFooter, let delegate = footer.delegate {
+            footer.frame = CGRect(x: 0, y: 0, width: self.mj_w, height: delegate.contentHeight())
+        }
+        
         if zx_footer != loadMoreFooter {
             zx_footer?.removeFromSuperview()
             
@@ -71,7 +76,16 @@ extension UIScrollView {
     
     public func endRefreshing(isSuccess: Bool) {
         self.zx_header?.endRefresing(isSuccess: isSuccess)
+        if isSuccess {
+            // 重置footer状态（防止footer还处在数据加载完成状态）
+            self.zx_footer?.state = .idle
+        }
     }
+    
+    public func endLoadMore(isNoMoreData: Bool) {
+        self.zx_footer?.endLoadMore(isNoMoreData: isNoMoreData)
+    }
+    
 }
 
 extension UIScrollView {

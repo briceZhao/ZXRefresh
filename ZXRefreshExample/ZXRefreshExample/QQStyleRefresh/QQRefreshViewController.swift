@@ -16,7 +16,7 @@ class QQRefreshViewController: BaseViewController {
         let qqHeader = QQRefreshHeader()
         self.tableView.addRefreshHeaderView(qqHeader, refreshBlock: { 
             [unowned self] in
-            print("custom refreshBlock")
+            
             self.refresh()
         })
     }

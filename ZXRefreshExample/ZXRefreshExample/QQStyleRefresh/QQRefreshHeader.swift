@@ -20,8 +20,7 @@ class QQRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
     
     override public init(frame: CGRect) {
         control = QQStylePullingIndicator(frame: frame)
-        let adjustFrame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: totalHegiht)
-        super.init(frame: adjustFrame)
+        super.init(frame: frame)
         
         self.autoresizingMask = .flexibleWidth
         self.backgroundColor = UIColor.white
@@ -54,6 +53,7 @@ class QQRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
         return 80.0
     }
     
+    
     func toNormalState() {
         self.control.isHidden = false
         self.imageView.isHidden = true
@@ -79,6 +79,7 @@ class QQRefreshHeader: ZXRefreshHeader, ZXRefreshHeaderDelegate {
             self.control.progress = 1.0
         }
     }
+    
     func toWillRefreshState() {
         
     }
