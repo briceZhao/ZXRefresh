@@ -60,6 +60,7 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
                 UIView.animate(withDuration: ZXRefreshConstant.animationDuration, animations: {
                     self.scrollView?.contentInset.top += self.insetTDelta
                 }, completion: { (finished) in
+                    self.delegate?.willCompleteEndRefreshing()
                     // reload
                     self.delegate?.toNormalState()
                 })
@@ -80,7 +81,7 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
                         guard let originInset = self.scrollViewOriginalInset else {
                             return
                         }
-                        let top: CGFloat = originInset.top + self.refreshingHoldHeight()
+                        let top: CGFloat = originInset.top + self.mj_h
                         // 增加滚动区域top
                         self.scrollView?.mj_insetT = top
                         // 设置滚动位置
@@ -118,7 +119,7 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
         }
         
         // newSuperview != nil 被添加到新的View上
-        self.mj_y = -self.refreshingHoldHeight()
+        self.mj_y = -self.mj_h
     }
     
     override public func layoutSubviews() {
@@ -151,7 +152,7 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
             }
             // 考虑SectionHeader停留时的高度
             var insetT: CGFloat = -scrollV.mj_offsetY > originalInset.top ? -scrollV.mj_offsetY : originalInset.top
-            insetT = insetT > self.refreshingHoldHeight() + originalInset.top ? self.refreshingHoldHeight() + originalInset.top : insetT
+            insetT = insetT > self.mj_h + originalInset.top ? self.mj_h + originalInset.top : insetT
             
             scrollV.mj_insetT = insetT
             self.insetTDelta = originalInset.top - insetT;
@@ -172,7 +173,7 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
         }
         
         // 普通 和 即将刷新 的临界点
-        let idle2pullingOffsetY: CGFloat = headerInOffsetY - self.refreshingHoldHeight();
+        let idle2pullingOffsetY: CGFloat = headerInOffsetY - self.mj_h
         
         if scrollV.isDragging {
             switch state {
@@ -185,7 +186,7 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
                 if offsetY <= idle2pullingOffsetY {
                     state = .willRefresh
                 } else {
-                    self.pullingPercent = (headerInOffsetY - offsetY) / self.refreshingHoldHeight();
+                    self.pullingPercent = (headerInOffsetY - offsetY) / self.mj_h
                     
                 }
             case .willRefresh:
@@ -221,7 +222,6 @@ public class ZXRefreshHeader: ZXRefreshComponent, ZXRefreshComponentDelegate {
     
     final public func endRefresing(isSuccess: Bool) {
         
-        let delegate: ZXRefreshHeaderDelegate? = self as? ZXRefreshHeaderDelegate
         delegate?.willBeginEndRefershing(isSuccess: isSuccess)
         let deadLineTime = DispatchTime.now() + .seconds(1)
         DispatchQueue.main.asyncAfter(deadline: deadLineTime) {
