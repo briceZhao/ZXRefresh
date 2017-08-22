@@ -16,21 +16,20 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let section0 = SectionModel(rowsCount: 1,
+        let section0 = SectionModel(rowsCount: 4,
+                                    sectionTitle:"Default",
+                                    rowsTitles: ["Tableview","CollectionView","ScrollView","WebView"],
+                                    rowsTargetControlerNames:["DefaultTableViewController","DefaultCollectionViewController","DefaultScrollViewController","DefaultWebViewController"])
+        
+        let section1 = SectionModel(rowsCount: 1,
                                     sectionTitle:"Build In",
                                     rowsTitles: ["QQ Style",],
                                     rowsTargetControlerNames:["QQRefreshViewController"])
         
-        let section1 = SectionModel(rowsCount: 6,
+        let section2 = SectionModel(rowsCount: 6,
                                     sectionTitle:"Customize",
                                     rowsTitles: ["YahooWeather","Curve Mask","Youku","TaoBao","QQ Video","DianPing"],
                                     rowsTargetControlerNames:["YahooWeatherTableViewController","CurveMaskTableViewController","YoukuTableViewController","TaobaoTableViewController","QQVideoTableviewController","DianpingTableviewController"])
-        
-        
-        let section2 = SectionModel(rowsCount: 8,
-                                    sectionTitle:"Test",
-                                    rowsTitles: ["YahooWeather","Curve Mask","Youku","TaoBao","QQ Video","DianPing","Boys","Girls"],
-                                    rowsTargetControlerNames:["YahooWeatherTableViewController","CurveMaskTableViewController","YoukuTableViewController","TaobaoTableViewController","QQVideoTableviewController","DianpingTableviewController","DianpingTableviewController","DianpingTableviewController"])
         
         models.append(section0)
         models.append(section1)
@@ -39,7 +38,6 @@ class ViewController: UITableViewController {
         self.tableView.addRefreshHeaderView {
             [unowned self] in
             
-            print("custom refreshBlock")
             self.refresh()
         }
         
@@ -108,6 +106,7 @@ class ViewController: UITableViewController {
         className = "ZXRefreshExample.\(className)"
         
         if let cls = NSClassFromString(className) as? UIViewController.Type{
+            
             let dvc = cls.init()
             self.navigationController?.pushViewController(dvc, animated: true)
         }

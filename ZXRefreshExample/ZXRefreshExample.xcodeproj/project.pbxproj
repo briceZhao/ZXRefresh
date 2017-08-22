@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65C4BB281F4BF98C00A6A1DF /* DefaultCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C4BB271F4BF98C00A6A1DF /* DefaultCollectionViewController.swift */; };
+		65C4BB2A1F4C07C500A6A1DF /* DefaultScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C4BB291F4C07C500A6A1DF /* DefaultScrollViewController.swift */; };
+		65C4BB2C1F4C087D00A6A1DF /* DefaultTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C4BB2B1F4C087D00A6A1DF /* DefaultTableViewController.swift */; };
+		65C4BB2E1F4C091400A6A1DF /* DefaultWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C4BB2D1F4C091400A6A1DF /* DefaultWebViewController.swift */; };
 		65F4CEC81F430B6E0041C311 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F4CEC71F430B6E0041C311 /* AppDelegate.swift */; };
 		65F4CECA1F430B6E0041C311 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F4CEC91F430B6E0041C311 /* ViewController.swift */; };
 		65F4CECD1F430B6E0041C311 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65F4CECB1F430B6E0041C311 /* Main.storyboard */; };
@@ -25,6 +29,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		65C4BB271F4BF98C00A6A1DF /* DefaultCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultCollectionViewController.swift; sourceTree = "<group>"; };
+		65C4BB291F4C07C500A6A1DF /* DefaultScrollViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultScrollViewController.swift; sourceTree = "<group>"; };
+		65C4BB2B1F4C087D00A6A1DF /* DefaultTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultTableViewController.swift; sourceTree = "<group>"; };
+		65C4BB2D1F4C091400A6A1DF /* DefaultWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultWebViewController.swift; sourceTree = "<group>"; };
 		65F4CEC41F430B6E0041C311 /* ZXRefreshExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZXRefreshExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65F4CEC71F430B6E0041C311 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		65F4CEC91F430B6E0041C311 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -55,6 +63,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		65C4BB261F4BF8F800A6A1DF /* Default */ = {
+			isa = PBXGroup;
+			children = (
+				65C4BB271F4BF98C00A6A1DF /* DefaultCollectionViewController.swift */,
+				65C4BB291F4C07C500A6A1DF /* DefaultScrollViewController.swift */,
+				65C4BB2B1F4C087D00A6A1DF /* DefaultTableViewController.swift */,
+				65C4BB2D1F4C091400A6A1DF /* DefaultWebViewController.swift */,
+			);
+			path = Default;
+			sourceTree = "<group>";
+		};
 		65F4CEBB1F430B6E0041C311 = {
 			isa = PBXGroup;
 			children = (
@@ -79,6 +98,7 @@
 				65F4CF091F457FD10041C311 /* BaseViewController.swift */,
 				65F4CED91F430C450041C311 /* ZXRefresh */,
 				65F4CF0B1F4581020041C311 /* QQStyleRefresh */,
+				65C4BB261F4BF8F800A6A1DF /* Default */,
 				65F4CEE61F444D220041C311 /* SectionModel.swift */,
 				65F4CECB1F430B6E0041C311 /* Main.storyboard */,
 				65F4CECE1F430B6E0041C311 /* Assets.xcassets */,
@@ -189,13 +209,17 @@
 				65F4CEDB1F430C640041C311 /* ZXRefreshConstant.swift in Sources */,
 				65F4CEE51F4449880041C311 /* ZXLoadMoreFooter.swift in Sources */,
 				65F4CEE71F444D220041C311 /* SectionModel.swift in Sources */,
+				65C4BB2A1F4C07C500A6A1DF /* DefaultScrollViewController.swift in Sources */,
 				65F4CEE11F4438600041C311 /* ZXRefreshHeader.swift in Sources */,
 				65F4CF0A1F457FD10041C311 /* BaseViewController.swift in Sources */,
 				65F4CEC81F430B6E0041C311 /* AppDelegate.swift in Sources */,
+				65C4BB281F4BF98C00A6A1DF /* DefaultCollectionViewController.swift in Sources */,
 				65F4CEDF1F430D100041C311 /* ZXRefreshComponent.swift in Sources */,
+				65C4BB2E1F4C091400A6A1DF /* DefaultWebViewController.swift in Sources */,
 				65F4CF0F1F4581A20041C311 /* QQRefreshHeader.swift in Sources */,
 				65F4CEE31F4446E00041C311 /* ZXRefreshExtension.swift in Sources */,
 				65F4CF131F45827F0041C311 /* QQStylePullingIndicator.swift in Sources */,
+				65C4BB2C1F4C087D00A6A1DF /* DefaultTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
